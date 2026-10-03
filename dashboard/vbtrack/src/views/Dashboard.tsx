@@ -65,7 +65,12 @@ export function Dashboard() {
         {detail && (
           <CardTabs
             tabs={[
-              { id: 'summary', title: 'Action summary', content: <ActionSummary actions={detail.actions} /> },
+              {
+                id: 'summary',
+                title: 'Action summary',
+                badge: detail.actionsSource === 'mongo' ? 'LLM labels from MongoDB' : 'mock data (API offline)',
+                content: <ActionSummary actions={detail.actions} stats={detail.playerStats} />,
+              },
               { id: 'feed', title: 'Play-by-play', content: <ActionFeed actions={detail.actions} /> },
             ]}
           />

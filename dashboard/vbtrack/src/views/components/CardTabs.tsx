@@ -4,6 +4,7 @@ import { type ReactNode, useState } from 'react'
 interface Tab {
   id: string
   title: string
+  badge?: string
   content: ReactNode
 }
 
@@ -24,7 +25,10 @@ export function CardTabs({ tabs }: { tabs: Tab[] }) {
             data-active={t.id === activeId}
             onClick={() => setActiveId(t.id)}
           >
-            <h2>{t.title}</h2>
+            <h2>
+              {t.title}
+              {t.badge && <small className="card-tab-badge">{t.badge}</small>}
+            </h2>
           </button>
         ))}
       </div>

@@ -681,6 +681,14 @@
   line-height: 1.3;
 }
 
+.card-tab-badge {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
 .card-tab:hover {
   background: var(--surface-2);
 }

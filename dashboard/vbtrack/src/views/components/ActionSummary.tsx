@@ -1,8 +1,10 @@
-import type { ActionEvent } from '../../models/types'
+import type { ActionEvent, PlayerStats } from '../../models/types'
 
 interface Row {
   trackId: string
+  playerNo: number | null
   serves: number
+  servesWon: number
   spikes: number
   kills: number
   blocks: number
@@ -11,12 +13,15 @@ interface Row {
   successful: number
 }
 
+// Client-side fallback, used only when the API (MongoDB aggregate) is down.
 function aggregate(actions: ActionEvent[]): Row[] {
   const byTrack = new Map<string, Row>()
   for (const a of actions) {
     const row = byTrack.get(a.trackId) ?? {
       trackId: a.trackId,
+      playerNo: null,
       serves: 0,
+      servesWon: 0,
       spikes: 0,
       kills: 0,
       blocks: 0,
@@ -25,8 +30,12 @@ function aggregate(actions: ActionEvent[]): Row[] {
       successful: 0,
     }
     row.total += 1
+    if (a.playerNo !== null) row.playerNo = a.playerNo
     if (a.successful) row.successful += 1
-    if (a.action === 'serve') row.serves += 1
+    if (a.action === 'serve') {
+      row.serves += 1
+      if (a.successful) row.servesWon += 1
+    }
     if (a.action === 'spike') {
       row.spikes += 1
       if (a.successful) row.kills += 1
@@ -40,20 +49,26 @@ function aggregate(actions: ActionEvent[]): Row[] {
   return [...byTrack.values()].sort((a, b) => b.kills - a.kills || b.total - a.total)
 }
 
-export function ActionSummary({ actions }: { actions: ActionEvent[] }) {
-  if (actions.length === 0) {
+interface Props {
+  actions: ActionEvent[]
+  // Rows aggregated per track_id in MongoDB; null = aggregate `actions` here.
+  stats?: PlayerStats[] | null
+}
+
+export function ActionSummary({ actions, stats }: Props) {
+  const rows: Row[] = stats ?? aggregate(actions)
+  if (rows.length === 0) {
     return <p className="empty-state">No actions recognized in this session.</p>
   }
-  const rows = aggregate(actions)
 
   return (
     <table className="ak-table">
       <thead>
         <tr>
           <th>Player</th>
-          <th>Serves</th>
+          <th>Serves (in)</th>
           <th>Spikes (kills)</th>
-          <th>Blocks</th>
+          <th>Blocks (won)</th>
           <th>Success %</th>
         </tr>
       </thead>
@@ -62,15 +77,18 @@ export function ActionSummary({ actions }: { actions: ActionEvent[] }) {
           <tr key={r.trackId}>
             <td>
               <span className="ak-player">{r.trackId}</span>
+              {r.playerNo !== null && <small> · no. {r.playerNo}</small>}
             </td>
-            <td>{r.serves}</td>
+            <td>
+              {r.serves} ({r.servesWon})
+            </td>
             <td>
               {r.spikes} ({r.kills})
             </td>
             <td>
               {r.blocks} ({r.blocksWon})
             </td>
-            <td>{Math.round((r.successful / r.total) * 100)}%</td>
+            <td>{r.total ? Math.round((r.successful / r.total) * 100) : 0}%</td>
           </tr>
         ))}
       </tbody>
