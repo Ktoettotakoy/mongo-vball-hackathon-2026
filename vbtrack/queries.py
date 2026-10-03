@@ -34,7 +34,7 @@ def ball_trajectory(db: Database, session: str, out_csv: str | None = None, dete
 
 def print_players(db: Database, session: str) -> None:
     for t in db.tracks.find({"session_id": ObjectId(session)}).sort("frames_seen", -1):
-        print(f"track {t['track_id']:>4}  frames {t['first_frame']}-{t['last_frame']} "
+        print(f"track {t['track_id']:>4}  no.{t.get('number') or '?':<3} frames {t['first_frame']}-{t['last_frame']} "
               f"(seen {t['frames_seen']})  avg conf {t['avg_conf']:.2f}  "
               f"avg foot ({t['avg_foot']['x']:.0f}, {t['avg_foot']['y']:.0f})")
 

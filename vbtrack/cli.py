@@ -13,6 +13,7 @@ import argparse
 import logging
 import os
 
+from .hub import PERSON_BALL_REPO, REF_BALL_WEIGHTS
 from .storage import MongoStore
 
 
@@ -33,16 +34,27 @@ def main(argv=None):
 
     r = sub.add_parser("run", help="process a video file or live stream")
     r.add_argument("--source", required=True, help="video path, webcam index, or rtsp/http URL")
-    r.add_argument("--player-weights", default="yolo11n.pt")
-    r.add_argument("--ball-weights", default=None, help="custom volleyball detector (.pt)")
+    r.add_argument("--detector", default="dfine", choices=["dfine", "yolo"],
+                   help="dfine: fine-tuned volleyball person+ball model (default); yolo: COCO --player-weights")
+    r.add_argument("--dfine-repo", default=PERSON_BALL_REPO)
+    r.add_argument("--tile", type=int, default=0,
+                   help="D-FINE tile size in px; 0 = auto (whole frame up to 2000 px wide, else 864 px tiles)")
+    r.add_argument("--player-weights", default="yolo11n.pt", help="COCO YOLO weights for --detector yolo")
+    r.add_argument("--ball-weights", default=REF_BALL_WEIGHTS,
+                   help="extra YOLO ball model (.pt or hf://owner/repo/file.pt); 'none' to disable")
     r.add_argument("--ball-class", type=int, default=0)
     r.add_argument("--imgsz", type=int, default=1280)
     r.add_argument("--ball-imgsz", type=int, default=1280)
-    r.add_argument("--player-conf", type=float, default=0.35)
-    r.add_argument("--ball-conf", type=float, default=0.15)
+    r.add_argument("--player-conf", type=float, default=0.6)
+    r.add_argument("--ball-conf", type=float, default=0.4)
+    r.add_argument("--ref-ball-conf", type=float, default=0.7, help="threshold for the --ball-weights model")
+    r.add_argument("--no-jersey", action="store_true", help="don't read jersey numbers")
+    r.add_argument("--jersey-every", type=int, default=3, help="read numbers every Nth processed frame")
+    r.add_argument("--no-court", action="store_true", help="don't auto-detect the court ROI")
     r.add_argument("--tracker", default="bytetrack.yaml", choices=["bytetrack.yaml", "botsort.yaml"])
     r.add_argument("--stride", type=int, default=1)
-    r.add_argument("--roi", type=parse_roi, default=None, help="court polygon 'x1,y1;x2,y2;...'")
+    r.add_argument("--roi", type=parse_roi, default=None,
+                   help="court polygon 'x1,y1;x2,y2;...' (default: found by the court keypoint model)")
     r.add_argument("--device", default=None)
     r.add_argument("--show", action="store_true")
     r.add_argument("--save-video", default=None)
@@ -59,14 +71,18 @@ def main(argv=None):
 
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    logging.getLogger("httpx").setLevel(logging.WARNING)   # huggingface_hub logs every request
 
     if args.cmd == "run":
         from .pipeline import Config, Pipeline  # heavy import only when needed
         store = MongoStore(args.mongo, args.db, batch_size=args.batch_size)
         cfg = Config(
-            source=args.source, player_weights=args.player_weights, ball_weights=args.ball_weights,
+            source=args.source, detector=args.detector, dfine_repo=args.dfine_repo, tile=args.tile,
+            player_weights=args.player_weights,
+            ball_weights=None if args.ball_weights.lower() == "none" else args.ball_weights,
+            jersey=not args.no_jersey, jersey_every=args.jersey_every, court=not args.no_court,
             ball_class=args.ball_class, imgsz=args.imgsz, ball_imgsz=args.ball_imgsz,
-            player_conf=args.player_conf, ball_conf=args.ball_conf, tracker=args.tracker,
+            player_conf=args.player_conf, ball_conf=args.ball_conf, ref_ball_conf=args.ref_ball_conf, tracker=args.tracker,
             stride=args.stride, roi=args.roi, device=args.device, show=args.show,
             save_video=args.save_video, max_frames=args.max_frames,
         )

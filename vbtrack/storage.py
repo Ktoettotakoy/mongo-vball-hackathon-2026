@@ -4,7 +4,7 @@ Collections
 -----------
 sessions : one doc per run (video file or live stream)
 frames   : one doc per processed frame: players + ball   (bulk-inserted in batches)
-tracks   : one doc per player track, rebuilt from `frames` when a session ends
+tracks   : one doc per player track, rebuilt from `frames` when a session ends (+ voted jersey number)
 """
 from __future__ import annotations
 
@@ -53,6 +53,9 @@ class MongoStore:
         self.session_id = self.db.sessions.insert_one(doc).inserted_id
         return self.session_id
 
+    def update_session(self, fields: dict[str, Any]) -> None:
+        self.db.sessions.update_one({"_id": self.session_id}, {"$set": fields})
+
     def add_frame(self, doc: dict) -> None:
         doc["session_id"] = self.session_id
         self._buf.append(doc)
@@ -67,9 +70,12 @@ class MongoStore:
             self._buf = []
         self._last_flush = time.monotonic()
 
-    def end_session(self, status: str = "done") -> None:
+    def end_session(self, status: str = "done", track_numbers: dict[int, dict] | None = None) -> None:
         self.flush()
         self.build_tracks()
+        for tid, j in (track_numbers or {}).items():
+            self.db.tracks.update_one({"session_id": self.session_id, "track_id": tid},
+                                      {"$set": {"number": j["number"], "jersey_votes": j["votes"]}})
         self.db.sessions.update_one({"_id": self.session_id},
                                     {"$set": {"status": status, "ended_at": utcnow()}})
 

@@ -49,9 +49,11 @@ def test_build_tracks(store):
         if i >= 5:
             ps.append(player(2, 800, 400))
         store.add_frame(frame(i, ps, {"x": 1.0, "y": 2.0, "interpolated": False}))
-    store.end_session()
+    store.end_session(track_numbers={1: {"number": "12", "votes": {"12": 3}}})
     tracks = {t["track_id"]: t for t in store.db.tracks.find({"session_id": sid})}
     assert tracks[1]["frames_seen"] == 10 and tracks[1]["first_frame"] == 0
     assert tracks[2]["frames_seen"] == 5 and tracks[2]["first_frame"] == 5
     assert tracks[2]["avg_foot"] == {"x": 800, "y": 400}
+    assert tracks[1]["number"] == "12" and tracks[1]["jersey_votes"] == {"12": 3}
+    assert "number" not in tracks[2]
     assert store.db.sessions.find_one({"_id": sid})["status"] == "done"
