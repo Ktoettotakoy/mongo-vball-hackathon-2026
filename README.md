@@ -119,6 +119,46 @@ db.frames.aggregate([{$match: {session_id: ObjectId("..."), "players.track_id": 
   {$project: {t: 1, x: "$players.foot.x", y: "$players.foot.y"}}])
 ```
 
+## LLM action labels and player statistics
+
+`vbtrack/label.py` sends video frames to an LLM through Hoplite. The LLM returns serve, spike and block events as JSON. The script writes the events to MongoDB.
+
+Flow per video:
+
+1. The script samples 60 frames and tiles them into 10 contact sheets. Hoplite accepts a maximum of 10 attachments.
+2. The script starts a Hoplite thread with the prompt and the sheets.
+3. The script waits for the reply, then validates the JSON.
+4. The script replaces the video's documents in `events` and records the run in `label_runs`.
+
+When all videos are done, the script rebuilds `player_stats` and prints one row for each `track_id`.
+
+Set these keys in `.env`: `Token_for_LLM`, `MONGO_URI`, `MONGO_DB`, `MONGO_COLLECTION`. `HOPLITE_PROJECT_ID` and `HOPLITE_MODEL` are optional.
+
+```bash
+python -m vbtrack.label annotated_7.mp4 annotated_8.mp4 annotated_9.mp4 annotated_10.mp4
+python -m vbtrack.label game1.mp4 --session <session_id>   # draw #track_id boxes from `frames`
+python -m vbtrack.label annotated_7.mp4 --force --dump-dir sheets/   # label again, keep the sheets
+python -m vbtrack.stats                                     # print and rebuild player stats
+```
+
+The annotated videos show a jersey number when the reader finds one. To get tracker IDs on every box, use a raw video with `--session`.
+
+**events**: one document for each action
+```js
+{ video: "annotated_10.mp4", frame: 42, track_id: "#19", player_no: 7 | null,
+  action: "serve" | "spike" | "block", successful: true, block_type: "full" | "solo",
+  labelled_at, thread_id, source: "llm" }
+```
+
+### Dashboard
+
+```bash
+uvicorn vbtrack.api:app --port 8000      # GET /api/players, /api/events, /api/videos
+cd dashboard/vbtrack && pnpm dev         # Vite sends /api to port 8000
+```
+
+If the API is not available, the dashboard shows mock actions.
+
 ## Tuning tips
 
 | Problem | Try |

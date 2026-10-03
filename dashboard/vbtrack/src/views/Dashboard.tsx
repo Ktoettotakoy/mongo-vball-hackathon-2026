@@ -89,8 +89,11 @@ export function Dashboard() {
 
               <div className="section-row">
                 <div className="card">
-                  <h2>Action summary</h2>
-                  <ActionSummary actions={detail.actions} />
+                  <h2>
+                    Action summary{' '}
+                    <small>{detail.actionsSource === 'mongo' ? '· LLM labels from MongoDB' : '· mock data (API offline)'}</small>
+                  </h2>
+                  <ActionSummary actions={detail.actions} stats={detail.playerStats} />
                 </div>
                 <div className="card">
                   <h2>Play-by-play</h2>

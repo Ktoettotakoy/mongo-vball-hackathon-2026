@@ -83,10 +83,31 @@ export interface RallyLog {
   rallies: RallyEvent[]
 }
 
+// One row per track_id, aggregated in MongoDB (vbtrack/stats.py, GET /api/players).
+export interface PlayerStats {
+  trackId: string
+  playerNo: number | null
+  videos: string[]
+  total: number
+  successful: number
+  serves: number
+  servesWon: number
+  spikes: number
+  kills: number
+  blocks: number
+  blocksWon: number
+  fullBlocks: number
+  soloBlocks: number
+  successPct: number
+}
+
 export interface SessionDetail {
   session: Session
   ball: BallPoint[]
   tracks: PlayerTrack[]
   rallyLog: RallyLog
   actions: ActionEvent[]
+  // null when the API is down: the UI then aggregates the mock actions itself.
+  playerStats: PlayerStats[] | null
+  actionsSource: 'mongo' | 'mock'
 }
