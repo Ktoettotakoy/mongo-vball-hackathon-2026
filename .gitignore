@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Testing cache
+.pytest_cache/
+
+# Model weights
+*.pt
+*.onnx
+*.engine
+
+# Video outputs
+*.mp4
+*.avi
+*.mov
+
+# OS artifacts
+.DS_Store
+
+# Local environment & IDE
+.env
+.vscode/*
+!.vscode/settings.json
