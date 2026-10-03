@@ -1,0 +1,68 @@
+.cs-root {
+  height: 60rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0.5rem;
+}
+
+.cs-inner {
+  padding: 2.5rem 0;
+  width: 100%;
+  position: relative;
+}
+
+.cs-header {
+  max-width: 64rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.cs-card {
+  max-width: 64rem;
+  margin: -3rem auto 0;
+  height: 30rem;
+  width: 100%;
+  border: 4px solid #6c6c6c;
+  padding: 0.5rem;
+  background: #222222;
+  border-radius: 30px;
+}
+
+.cs-card-inner {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #18181b;
+}
+
+.cs-card-inner video,
+.cs-card-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .cs-root {
+    height: 80rem;
+    padding: 5rem;
+  }
+
+  .cs-inner {
+    padding: 10rem 0;
+  }
+
+  .cs-card {
+    height: 40rem;
+    padding: 1.5rem;
+  }
+
+  .cs-card-inner {
+    padding: 1rem;
+  }
+}

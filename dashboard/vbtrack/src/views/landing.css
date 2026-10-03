@@ -1,0 +1,132 @@
+.cs-header .eyebrow {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.landing-root .cs-header {
+  max-width: none;
+  width: 100%;
+  padding: 0 clamp(16px, 4vw, 64px);
+}
+
+.cs-title {
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 600;
+  margin: 12px 0 0;
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+
+.cs-title-big {
+  display: inline-block;
+  font-size: clamp(48px, 11vw, 140px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.landing-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(48px, 10vh, 96px) clamp(16px, 4vw, 48px);
+}
+
+.sponsor-section {
+  align-self: stretch;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 56px;
+}
+
+.sponsor-half {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 48px 24px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.sponsor-half:first-child {
+  border-right: 1px solid var(--border);
+}
+
+.sponsor-half:hover {
+  background: var(--surface-1);
+}
+
+.sponsor-eyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.sponsor-name {
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+@media (max-width: 640px) {
+  .sponsor-section {
+    grid-template-columns: 1fr;
+  }
+  .sponsor-half:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+.landing-hero {
+  max-width: 640px;
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.landing-hero h1 {
+  font-size: 44px;
+  font-weight: 600;
+  margin: 4px 0 0;
+  letter-spacing: -0.5px;
+}
+
+.landing-sub {
+  margin: 16px 0 0;
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.landing-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 28px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--text-primary);
+  color: var(--surface-1);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.landing-cta:hover {
+  opacity: 0.85;
+}
+
+.landing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+}
+
