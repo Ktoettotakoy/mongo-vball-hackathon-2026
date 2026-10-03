@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useDashboardData } from '../controllers/useDashboardData'
 import { ContainerScroll } from './components/ContainerScroll'
+import { MongoDBMark } from './components/MongoDBMark'
 import { StatTile } from './components/StatTile'
 import './dashboard.css'
 import './landing.css'
@@ -38,11 +39,13 @@ export function LandingPage() {
       <div className="sponsor-section">
         <a className="sponsor-half" href="https://www.mongodb.com" target="_blank" rel="noreferrer">
           <span className="sponsor-eyebrow">Sponsor</span>
+          <MongoDBMark className="sponsor-logo sponsor-logo-mongodb" />
           <span className="sponsor-name">MongoDB</span>
         </a>
-        <a className="sponsor-half" href="https://hotplit.sh" target="_blank" rel="noreferrer">
+        <a className="sponsor-half" href="https://hoplite.sh" target="_blank" rel="noreferrer">
           <span className="sponsor-eyebrow">Sponsor</span>
-          <span className="sponsor-name">hotplit.sh</span>
+          <img className="sponsor-logo" src="/logos/hoplite.svg" alt="Hoplite" />
+          <span className="sponsor-name">Hoplite</span>
         </a>
       </div>
 

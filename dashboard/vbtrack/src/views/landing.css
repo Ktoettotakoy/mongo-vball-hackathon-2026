@@ -61,6 +61,22 @@
   background: var(--surface-1);
 }
 
+.sponsor-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.sponsor-logo-mongodb {
+  color: #00684a;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sponsor-logo-mongodb {
+    color: #00ed64;
+  }
+}
+
 .sponsor-eyebrow {
   font-size: 12px;
   text-transform: uppercase;
